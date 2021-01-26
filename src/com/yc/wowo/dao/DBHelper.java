@@ -194,23 +194,11 @@ public class DBHelper{
 	 * @param params 要执行的sql语句中对应占位符?的值，即按照?的顺序给定的值
 	 * @return
 	 */
-	public int update(String sql, List<Object> params) {  // 采用不定参数形式
-		int result = -1;
-		Connection con = null;
-		PreparedStatement pstmt = null;
-
-		try {
-			con = this.getConnection();
-
-			pstmt= con.prepareStatement(sql); // 预编译执行语句
-			this.setParams(pstmt, params); //  给预编译执行语句中的占位符赋值
-			result = pstmt.executeUpdate(); // 执行更新
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			this.close(null, pstmt, con);
+	public int update(String sql, List<Object> params) { 
+		if (params == null || params.isEmpty()) {
+			return update(sql);
 		}
-		return result;
+		return update(sql, params.toArray());
 	}
 
 	/**
@@ -290,57 +278,10 @@ public class DBHelper{
 	}
 
 	public List<Map<String, Object>> finds(String sql, List<Object> params) {
-		List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		try {
-			con = this.getConnection(); // 获取连接
-			pstmt = con.prepareStatement(sql); // 预编译语句
-			this.setParams(pstmt, params); // 给预编译语句中的占位符赋值
-			rs = pstmt.executeQuery(); // 执行查询
-			Map<String, Object> map = null;
-
-			// 如果获取结果集中列的类名 -> 取到列名后我们存到一个数组中，便于后面的循环取值 -> 如何确定数组的大小?
-			String[] colNames = this.getColumnNames(rs);
-
-			Object obj = null; // 列的数据
-			String colType = null; // 返回的这个列的数据的类型名称
-			Blob blob = null;
-			byte[] bt = null;
-			while(rs.next()) { // 每次循环得到一行数据
-				map = new HashMap<String, Object>();
-
-				// 循环获取每一列的值，循环所有的列名，根据列名获取当前这一行这一列的值
-				for (String colName : colNames) {
-					// 首先我们不必获取返回的这个列的数据的类型是不是blob，若干是blob那么我们就转成字节数组将这个数据存到本地
-					obj = rs.getObject(colName);
-
-					if (obj == null) {
-						map.put(colName, obj);
-						continue;
-					}
-
-					// 获取这个列值对象的类型
-					colType = obj.getClass().getSimpleName();
-					if ("BLOB".equals(colType)) {
-						// 用blob获取，然后转成字节数据
-						blob = rs.getBlob(colName);
-						bt = blob.getBytes(1, (int)blob.length());
-						map.put(colName,  bt);
-					} else {
-						map.put(colName, obj);
-					}
-				}
-				list.add(map);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			this.close(rs, pstmt, con);
+		if (params == null || params.isEmpty()) {
+			return finds(sql);
 		}
-		return list;
+		return finds(sql, params.toArray());
 	}
 
 	/**
@@ -382,35 +323,10 @@ public class DBHelper{
 	}
 
 	public List<Map<String, String>> gets(String sql, List<Object> params) {
-		List<Map<String, String>> list = new ArrayList<Map<String, String>>();
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		try {
-			con = this.getConnection(); // 获取连接
-			pstmt = con.prepareStatement(sql); // 预编译语句
-			this.setParams(pstmt, params); // 给预编译语句中的占位符赋值
-			rs = pstmt.executeQuery(); // 执行查询
-			Map<String, String> map = null;
-
-			// 如果获取结果集中列的类名 -> 取到列名后我们存到一个数组中，便于后面的循环取值 -> 如何确定数组的大小?
-			String[] colNames = this.getColumnNames(rs);
-			while(rs.next()) { // 每次循环得到一行数据
-				map = new HashMap<String, String>();
-
-				// 循环获取每一列的值，循环所有的列名，根据列名获取当前这一行这一列的值
-				for (String colName : colNames) {
-					map.put(colName, rs.getString(colName));
-				}
-				list.add(map);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			this.close(rs, pstmt, con);
+		if (params == null || params.isEmpty()) {
+			return gets(sql);
 		}
-		return list;
+		return gets(sql, params.toArray());
 	}
 
 	/**
@@ -473,56 +389,10 @@ public class DBHelper{
 	}
 
 	public Map<String, Object> find(String sql, List<Object> params) {
-		Map<String, Object> map = null;
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		try {
-			con = this.getConnection(); // 获取连接
-			pstmt = con.prepareStatement(sql); // 预编译语句
-			this.setParams(pstmt, params); // 给预编译语句中的占位符赋值
-			rs = pstmt.executeQuery(); // 执行查询
-
-			// 如果获取结果集中列的类名 -> 取到列名后我们存到一个数组中，便于后面的循环取值 -> 如何确定数组的大小?
-			String[] colNames = this.getColumnNames(rs);
-
-			Object obj = null; // 列的数据
-			String colType = null; // 返回的这个列的数据的类型名称
-			Blob blob = null;
-			byte[] bt = null;
-
-			if(rs.next()) { // 每次循环得到一行数据
-				map = new HashMap<String, Object>();
-
-				// 循环获取每一列的值，循环所有的列名，根据列名获取当前这一行这一列的值
-				for (String colName : colNames) {
-					// 首先我们不必获取返回的这个列的数据的类型是不是blob，若干是blob那么我们就转成字节数组将这个数据存到本地
-					obj = rs.getObject(colName);
-
-					if (obj == null) {
-						map.put(colName, obj);
-						continue;
-					}
-
-					// 获取这个列值对象的类型
-					colType = obj.getClass().getSimpleName();
-					if ("BLOB".equals(colType)) {
-						// 用blob获取，然后转成字节数据
-						blob = rs.getBlob(colName);
-						bt = blob.getBytes(1, (int)blob.length());
-						map.put(colName,  bt);
-					} else {
-						map.put(colName, obj);
-					}
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			this.close(rs, pstmt, con);
+		if (params == null || params.isEmpty()) {
+			return find(sql);
 		}
-		return map;
+		return find(sql, params.toArray());
 	}
 
 	/**
@@ -563,34 +433,10 @@ public class DBHelper{
 	}
 
 	public Map<String, String> get(String sql, List<Object> params) {
-		Map<String, String> map = null;
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		try {
-			con = this.getConnection(); // 获取连接
-			pstmt = con.prepareStatement(sql); // 预编译语句
-			this.setParams(pstmt, params); // 给预编译语句中的占位符赋值
-			rs = pstmt.executeQuery(); // 执行查询
-
-
-			// 如果获取结果集中列的类名 -> 取到列名后我们存到一个数组中，便于后面的循环取值 -> 如何确定数组的大小?
-			String[] colNames = this.getColumnNames(rs);
-			if(rs.next()) { // 每次循环得到一行数据
-				map = new HashMap<String, String>();
-
-				// 循环获取每一列的值，循环所有的列名，根据列名获取当前这一行这一列的值
-				for (String colName : colNames) {
-					map.put(colName, rs.getString(colName));
-				}
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			this.close(rs, pstmt, con);
+		if (params == null || params.isEmpty()) {
+			return get(sql);
 		}
-		return map;
+		return get(sql, params.toArray());
 	}
 
 	/**
@@ -622,25 +468,10 @@ public class DBHelper{
 	}
 
 	public int total(String sql, List<Object> params) {
-		int result = 0;
-		Connection con = null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		try {
-			con = this.getConnection(); // 获取连接
-			pstmt = con.prepareStatement(sql); // 预编译语句
-			this.setParams(pstmt, params); // 给预编译语句中的占位符赋值
-			rs = pstmt.executeQuery(); // 执行查询
-			if(rs.next()) { // 每次循环得到一行数据
-				result = rs.getInt(1);
-			}
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} finally {
-			this.close(rs, pstmt, con);
+		if (params == null || params.isEmpty()) {
+			return total(sql);
 		}
-		return result;
+		return total(sql, params.toArray());
 	}
 
 	/**
@@ -766,88 +597,10 @@ public class DBHelper{
 	 * @return
 	 */
 	public <T> List<T> finds(Class<T> c, String sql, List<Object> params) {
-		List<T> list = new ArrayList<T>();
-		Connection con= null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		try {
-			con = this.getConnection(); // 获取链接
-			pstmt = con.prepareStatement(sql); // 预编译执行语句块
-			this.setParams(pstmt, params); // 给预编译执行语句中的占位符赋值
-
-			rs = pstmt.executeQuery(); // 执行查询获取结果集
-
-			// 获取结果集中所有的列的类名
-			String[] colNames = this.getColumnNames(rs);
-
-			// 获取指定类中的所有setter方法
-			Map<String, Method> setters = this.getSetters(c);
-
-			// 将结果集中的数据注入到实体类对象中
-			T t;
-			String methodName = null;
-			Method method = null;
-			Class<?>[] types = null;
-			Class<?> type = null;
-
-			// 循环获取对象
-			while(rs.next()) {
-				// 先实例化一个对象
-				t = c.newInstance(); // 每循环一次就是一个实体类对象，所有每次循环我都需要创建一个对象  new StuInfo();
-
-				// 将这一行数据中每一列的值注入到对应的属性中
-				for (String colName: colNames) { // 循环所有列，将对应的值注入到对应的实体类属性中
-					methodName = "set" + colName; // setsid  setsname
-
-					// 根据方法名查找对应的setter方法
-					method = setters.getOrDefault(methodName, null);
-					
-					if (method == null) {
-						continue;
-					}
-
-					// 因为java中允许方法重载，所以我们在调用方法的时候必须确定形参的类型，所以我需要获取这个方法的形参列表
-					types = method.getParameterTypes();
-
-					if (types == null || types.length <= 0) { // 说明没有形参，那么我这个值也没法注入
-						continue; // 则结束本次循环，开始下个循环
-					}
-
-					// 如果有形参，按照规范，我们的setter方法里面只会有一个参数，所有我直接去第一个参数的类型
-					type = types[0];
-
-					// 接下来判断形参类型
-					if (Integer.TYPE == type || Integer.class == type) { // 说明要的是一个整形值或一个整形对象
-						// 反向激活这个方法，第一个参数是这个方法是哪个对象的，第二个参数是要注入的值，即这个方法的形参对应的实参值
-						method.invoke(t, rs.getInt(colName)); // obj.setSid(args) -> stu.setSid(101)
-					} else if (Float.TYPE == type || Float.class == type) {
-						method.invoke(t, rs.getFloat(colName));
-					} else if (Double.TYPE == type || Double.class == type) {
-						method.invoke(t, rs.getDouble(colName));
-					} else {
-						method.invoke(t, rs.getString(colName));
-					}
-				}
-
-				// 循环结束，说明所有的属性已经注值完成，即这个对象已经构成完成，则将这个对象存到集合中
-				list.add(t);
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} finally { // 关闭资源
-			this.close(rs, pstmt, con);
+		if (params == null || params.isEmpty()) {
+			return finds(c, sql);
 		}
-		return list;
+		return finds(c, sql, params.toArray());
 	}
 
 	/**
@@ -950,83 +703,9 @@ public class DBHelper{
 	 * @return
 	 */
 	public <T> T find(Class<T> c, String sql, List<Object> params) {
-		Connection con= null;
-		PreparedStatement pstmt = null;
-		ResultSet rs = null;
-
-		T t = null;
-		try {
-			con = this.getConnection(); // 获取链接
-			pstmt = con.prepareStatement(sql); // 预编译执行语句块
-			this.setParams(pstmt, params); // 给预编译执行语句中的占位符赋值
-
-			rs = pstmt.executeQuery(); // 执行查询获取结果集
-
-			// 获取结果集中所有的列的类名
-			String[] colNames = this.getColumnNames(rs);
-
-			// 获取指定类中的所有setter方法
-			Map<String, Method> setters = this.getSetters(c);
-
-			// 将结果集中的数据注入到实体类对象中
-			String methodName = null;
-			Method method = null;
-			Class<?>[] types = null;
-			Class<?> type = null;
-
-			// 循环获取对象
-			if(rs.next()) {
-				// 先实例化一个对象
-				t = c.newInstance(); // 每循环一次就是一个实体类对象，所有每次循环我都需要创建一个对象  new StuInfo();
-
-				// 将这一行数据中每一列的值注入到对应的属性中
-				for (String colName: colNames) { // 循环所有列，将对应的值注入到对应的实体类属性中
-					methodName = "set" + colName; // setsid  setsname
-
-					// 根据方法名查找对应的setter方法
-					method = setters.getOrDefault(methodName, null);
-					
-					if (method == null) {
-						continue;
-					}
-					
-					// 因为java中允许方法重载，所以我们在调用方法的时候必须确定形参的类型，所以我需要获取这个方法的形参列表
-					types = method.getParameterTypes();
-
-					if (types == null || types.length <= 0) { // 说明没有形参，那么我这个值也没法注入
-						continue; // 则结束本次循环，开始下个循环
-					}
-
-					// 如果有形参，按照规范，我们的setter方法里面只会有一个参数，所有我直接去第一个参数的类型
-					type = types[0];
-
-					// 接下来判断形参类型
-					if (Integer.TYPE == type || Integer.class == type) { // 说明要的是一个整形值或一个整形对象
-						// 反向激活这个方法，第一个参数是这个方法是哪个对象的，第二个参数是要注入的值，即这个方法的形参对应的实参值
-						method.invoke(t, rs.getInt(colName)); // obj.setSid(args) -> stu.setSid(101)
-					} else if (Float.TYPE == type || Float.class == type) {
-						method.invoke(t, rs.getFloat(colName));
-					} else if (Double.TYPE == type || Double.class == type) {
-						method.invoke(t, rs.getDouble(colName));
-					} else {
-						method.invoke(t, rs.getString(colName));
-					}
-				}
-			}
-
-		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (InstantiationException e) {
-			e.printStackTrace();
-		} catch (IllegalAccessException e) {
-			e.printStackTrace();
-		} catch (IllegalArgumentException e) {
-			e.printStackTrace();
-		} catch (InvocationTargetException e) {
-			e.printStackTrace();
-		} finally { // 关闭资源
-			this.close(rs, pstmt, con);
+		if (params == null || params.isEmpty()) {
+			return find(c, sql);
 		}
-		return t;
+		return find(c, sql, params.toArray());
 	}
 }
