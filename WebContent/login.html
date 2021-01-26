@@ -236,7 +236,7 @@ let login = new Vue({
 				return;
 			}
 			
-			axios.post("member", qs.stringify({op:"login", account:this.account, pwd:this.pwd})).then(rt => {
+			axios.post("member/login", qs.stringify({account:this.account, pwd:this.pwd})).then(rt => {
 				if (rt.status == 200 && rt.data.code == 200) {
 					// 获取来源地址，即是从哪个页面跳转过来的
 					var ref = document.referrer;

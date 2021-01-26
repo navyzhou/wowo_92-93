@@ -7,14 +7,14 @@ let header = new Vue({
 	},
 	mounted: function() { // vue渲染完成后要执行的方法
 		// 发送一个请求获取所有店铺类型信息，跟$.get()相似 ，  axios.get(请求地址，请求参数).then(回调函数)
-		axios.get("type", {params:{op:"finds"}}).then( rt => {
+		axios.get("type/finds").then( rt => {
 			if (rt.status == 200) { // 说明请求成功
 				this.types = rt.data; // 注意：this不能少，说明是取当前这个VUE对象中data里面的types属性
 			}
 		})
 		
 		// 发送一个请求去获取用户登录信息
-		axios.get("member", {params: {op:"check"}}).then( rt => {
+		axios.get("member/check").then( rt => {
 			if (rt.status == 200 && rt.data.code == 200) {
 				this.onlogin = true;
 				this.memberInfo = rt.data.data;

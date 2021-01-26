@@ -20,23 +20,11 @@ import com.yc.wowo.util.SessionKeyConstant;
  * @date 2020年10月26日
  * Email haijunzhou@hnit.edu.cn
  */
-@WebServlet("/member")
+@WebServlet("/member/*")
 public class MemberInfoServlet extends BaseServlet {
 	private static final long serialVersionUID = 1865483082245657427L;
 
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String op  = request.getParameter("op"); // 取出请求的操作标识符
-		
-		switch (op) {
-		case "reg": reg(request, response); break;  // 注册
-		case "login": login(request, response); break; // 登录
-		case "check": check(request, response); break; // 检查是否登录
-		default: this.error(request, response); break;
-		}
-	}
-
-	private void check(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void check(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Object obj = request.getSession().getAttribute(SessionKeyConstant.MEMBERINFOLOGIN);
 		if (obj == null) {
 			this.send(response, 500, "失败");
@@ -45,7 +33,7 @@ public class MemberInfoServlet extends BaseServlet {
 		this.send(response, 200, obj);
 	}
 
-	private void login(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void login(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String account = request.getParameter("account");
 		String pwd = request.getParameter("pwd");
 		
@@ -59,7 +47,7 @@ public class MemberInfoServlet extends BaseServlet {
 		this.send(response, 500, "失败");
 	}
 
-	private void reg(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void reg(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		MemberInfo mf = RequestParamUtil.getParams(MemberInfo.class, request);
 		
 		String code = String.valueOf(request.getSession().getAttribute(SessionKeyConstant.VERIFICATIONCODE));

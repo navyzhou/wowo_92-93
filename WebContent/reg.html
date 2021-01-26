@@ -290,7 +290,7 @@ let app = new Vue({
 				return;
 			}
 		
-			axios.post("member", qs.stringify({op:"reg", nickName:this.nickName, realName:this.realName, pwd:this.pwd, tel:this.tel, email:this.email})).then(rt=>{
+			axios.post("member/reg", qs.stringify({nickName:this.nickName, realName:this.realName, pwd:this.pwd, tel:this.tel, email:this.email})).then(rt=>{
 				if (rt.status == 200 && rt.data.code == 200) {
 					$("#registererform")[0].reset();
 					showMsg("注册成功，请先登录...", "green", function(){location.href='login.html'});
@@ -301,7 +301,6 @@ let app = new Vue({
 			})
 		}
 	}
-	
 })
 </script>
 </body>

@@ -3,7 +3,6 @@ package com.yc.wowo.servlet;
 import java.io.IOException;
 import java.util.List;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,24 +20,11 @@ import com.yc.wowo.util.SessionKeyConstant;
  * @date 2020年10月26日
  * Email haijunzhou@hnit.edu.cn
  */
-@WebServlet("/cart")
+@WebServlet("/cart/*")
 public class CartInfoServlet extends BaseServlet {
 	private static final long serialVersionUID = 1865483082245657427L;
 
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		String op  = request.getParameter("op"); // 取出请求的操作标识符
-		
-		switch (op) {
-		case "findByMid": findByMid(request, response); break; 
-		case "add": add(request, response); break; 
-		case "update": update(request, response); break;
-		case "del": del(request, response); break;
-		default: this.error(request, response); break;
-		}
-	}
-
-	private void del(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void del(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String cid = request.getParameter("cid");
 		
 		ICartInfoBiz cartInfoBiz = new CartInfoBizimpl();
@@ -49,7 +35,7 @@ public class CartInfoServlet extends BaseServlet {
 		this.send(response, 500, "失败");
 	}
 
-	private void update(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void update(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		String cid = request.getParameter("cid");
 		String num = request.getParameter("num");
 		
@@ -61,7 +47,7 @@ public class CartInfoServlet extends BaseServlet {
 		this.send(response, 500, "失败");
 	}
 
-	private void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void add(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Object obj = request.getSession().getAttribute(SessionKeyConstant.MEMBERINFOLOGIN);
 		if (obj == null) {
 			this.send(response, 501, "未登录");
@@ -79,7 +65,7 @@ public class CartInfoServlet extends BaseServlet {
 		this.send(response, 500, "失败");
 	}
 
-	private void findByMid(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	public void findByMid(HttpServletRequest request, HttpServletResponse response) throws IOException {
 		Object obj = request.getSession().getAttribute(SessionKeyConstant.MEMBERINFOLOGIN);
 		if (obj == null) {
 			this.send(response, 501, "未登录");

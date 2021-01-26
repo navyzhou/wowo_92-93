@@ -242,7 +242,7 @@ let ve = new Vue({
 		totalPrice: 0
 	},
 	mounted: function() {
-		axios.get('cart', {params:{op:"findByMid"}}).then(rt=>{
+		axios.get('cart/findByMid').then(rt=>{
 			if (rt.status == 200 && rt.data.code == 200) {
 				this.goods = rt.data.data;
 				this.getTotal();
@@ -258,7 +258,7 @@ let ve = new Vue({
 				return;
 			}
 			
-			axios.post("cart", qs.stringify({op:"update", cid:this.goods[index].cid, num:count})).then(rt => {
+			axios.post("cart/update", qs.stringify({cid:this.goods[index].cid, num:count})).then(rt => {
 				if (rt.status == 200 && rt.data.code == 200) {
 					this.goods[index].nums = count;
 					this.getTotal();
@@ -279,7 +279,7 @@ let ve = new Vue({
 			let cid = this.goods[index].cid;
 
 			// 先删除购物车中的数据
-			axios.post("cart", qs.stringify({op:"del", cid:cid})).then(rt => {
+			axios.post("cart/del", qs.stringify({cid:cid})).then(rt => {
 				if (rt.status == 200 && rt.data.code == 200) {
 					this.goods.splice(index, 1); // 从vue对象的数组中删除当前元素
 					this.getTotal(); // 重新计算总价

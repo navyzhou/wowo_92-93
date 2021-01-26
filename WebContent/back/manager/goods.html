@@ -68,7 +68,7 @@ var goods_obj;
 CKEDITOR.replace("goods_dialog_detail");
 
 $(function(){
-	$.post("../../shop", {op:"finds"}, data => {
+	$.post("../../shop/finds", null, data => {
 		goods_shops = data;
 		var str = '<option value="">--请选择--</option>';
 		$.each(data, function(index, item) {
@@ -83,8 +83,7 @@ $(function(){
 
 function showGoodsDataGrid() {
 	goods_obj = $('#goods_data').datagrid({   
-	    url:'../../goods',
-	    queryParams: {op:"findByPage"},
+	    url:'../../goods/findByPage',
 	    fitColumns: true,
 	    striped: true,
 	    loadMsg: "数据加载 中...",
@@ -155,13 +154,13 @@ function showAddGoodsInfoDialog() {
 }
 
 function searchGoodsInfo() {
-	var tid = $.trim($("#goods_search_sid").val());
+	var sid = $.trim($("#goods_search_sid").val());
 	var sname = $.trim($("#goods_search_gname").val());
 	var status = $.trim($("#goods_search_status").val());
 	
 	goods_obj.datagrid({
-		url: "../../goods",
-		queryParams: {op: "findCondition", sid:sid, gname:gname, status:status}
+		url: "../../goods/findCondition",
+		queryParams: {sid:sid, gname:sname, status:status}
 	})
 }
 
@@ -213,7 +212,7 @@ function goods_addInfo() {
 	var obj = {sid:sid, gname:gname, price:price, rebate:rebate, sdate:sdate, edate:edate, intro:intro, detail:detail};
 
 	$.ajaxFileUpload({
-		url: "../../goods?op=add", // 注意此时的op必须拼接在地址栏，不能放数据区，否则后台无法直接通过request.getParameter("op")获取
+		url: "../../goods/add", // 注意此时的op必须拼接在地址栏，不能放数据区，否则后台无法直接通过request.getParameter("op")获取
 		secureuri: false,
 		fileElementId: "goods_dialog_pics", // 所有file文本框的id属性值
 		dataType: "json", // 数据的格式

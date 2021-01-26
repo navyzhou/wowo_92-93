@@ -7,8 +7,7 @@ var types_op;
 var types_info;
 
 var types_obj = $('#types_data').datagrid({   
-    url:'../../type',
-    queryParams: {op:"findByPage"},
+    url:'../../type/findByPage',
     fitColumns: true,
     striped: true,
     loadMsg: "数据加载 中...",
@@ -91,11 +90,9 @@ var types_obj = $('#types_data').datagrid({
 			
 			// 此时row是一个Object，那么js中如何在对象中添加属性呢？
 			// row.op = "add";  // row["op"] = "add"
-			row.op = types_op;
-			1
 			// 将这一行数据发送到后台，插入到数据库中
 			// $.post("../../type", row, function(data){}, "json");
-			$.post("../../type", row, data => {
+			$.post("../../type/" + types_op, row, data => {
 				if (data.code == 200) {
 					$.messager.show({title:'成功提示', msg:'商品类型' + types_info + '成功...',	timeout:2000,showType:'slide'});
 					// 刷新页面数据

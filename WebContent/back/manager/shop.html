@@ -70,7 +70,7 @@ var shop_obj;
 bindAddr("../../xml/city.xml"); 
 
 $(function(){
-	$.post("../../type", {op:"finds"}, data => {
+	$.post("../../type/finds", null, data => {
 		shop_types = data;
 		var str = '<option value="">--请选择--</option>';
 		$.each(data, function(index, item) {
@@ -85,8 +85,7 @@ $(function(){
 
 function showShopDataGrid() {
 	shop_obj = $('#shop_data').datagrid({   
-	    url:'../../shop',
-	    queryParams: {op:"findByPage"},
+	    url:'../../shop/findByPage',
 	    fitColumns: true,
 	    striped: true,
 	    loadMsg: "数据加载 中...",
@@ -205,7 +204,7 @@ function shop_addInfo() {
 	var obj = {tid:tid, sname:sname, province:province, city:city, area:area, addr:addr, tel:tel, startHours:startHours, endHours:endHours, intro:intro}
 
 	$.ajaxFileUpload({
-		url: "../../shop?op=add", // 注意此时的op必须拼接在地址栏，不能放数据区，否则后台无法直接通过request.getParameter("op")获取
+		url: "../../shop/add", // 注意此时的op必须拼接在地址栏，不能放数据区，否则后台无法直接通过request.getParameter("op")获取
 		secureuri: false,
 		fileElementId: ["shop_dialog_license", "shop_dialog_pics"], // 所有file文本框的id属性值
 		dataType: "json", // 数据的格式
@@ -231,13 +230,13 @@ function searchShopInfo() {
 	var status = $.trim($("#shop_search_status").val());
 	
 	shop_obj.datagrid({
-		url: "../../shop",
-		queryParams: {op: "findCondition", tid:tid, sname:sname, status:status}
+		url: "../../shop/findCondition",
+		queryParams: {tid:tid, sname:sname, status:status}
 	})
 }
 
 function showShopInfoDetail(sid) {
-	$.post("../../shop", {op:"findBySid", sid:sid}, data => {
+	$.post("../../shop/findBySid", {sid:sid}, data => {
 		if (data.code == 200) { // 说明请求数据成功
 			$("#shop_form input,#shop_form textarea").attr("readonly", "true");
 			$("#shop_form select").attr("disabled", "true");

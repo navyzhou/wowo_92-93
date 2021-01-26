@@ -243,7 +243,7 @@ let goods_data = new Vue({
 		total: 0
 	},
 	mounted: function() {
-		axios.post("goods", qs.stringify({op: "findByFirst", page: page, rows: rows})).then(rt => {
+		axios.post("goods/findByFirst", qs.stringify({page: page, rows: rows})).then(rt => {
 			if (rt.status == 200) {
 				this.total = rt.data.total;
 				this.goods = rt.data.rows;
@@ -255,7 +255,7 @@ let goods_data = new Vue({
 
 function findByPage(index) {
 	page = index;
-	axios.post("goods", qs.stringify({op: "finds", page: page, rows: rows})).then(rt => {
+	axios.post("goods/finds", qs.stringify({page: page, rows: rows})).then(rt => {
 		if (rt.status == 200) {
 			goods_data.$data.goods = rt.data;
 		}
